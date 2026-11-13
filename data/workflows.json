@@ -1,0 +1,39 @@
+[
+  {
+    "id": "webhook-reconciliation",
+    "episode": 1,
+    "title": "Webhook Reconciliation",
+    "summary": "Catch every incoming webhook, check it against the source system, and fix mismatches automatically instead of finding them in a monthly audit.",
+    "problem": "Webhooks get dropped, duplicated or arrive out of order. When a payment or order event goes missing, nobody notices until a customer complains or the books don't balance.",
+    "trigger": "Incoming webhook (e.g. payment or order event)",
+    "tags": ["Webhooks", "Payments", "Data sync"],
+    "youtubeId": "ldGS5CaVGAQ",
+    "steps": [
+      { "type": "Integration", "name": "Receive webhook", "detail": "The workflow starts when the provider sends an event." },
+      { "type": "Javascript", "name": "Normalize & dedupe", "detail": "Map the payload to one shape and skip events already processed." },
+      { "type": "HTTP", "name": "Fetch source of truth", "detail": "Look up the same record in the provider's API." },
+      { "type": "Switch", "name": "Compare", "detail": "Branch on whether the webhook and the source record match." },
+      { "type": "HTTP", "name": "Repair record", "detail": "Update your system when the records disagree. Retries handle flaky APIs." },
+      { "type": "Integration", "name": "Alert on failure", "detail": "Post to Slack or Teams only if the repair still fails." }
+    ],
+    "outcome": "Every event is accounted for, mismatches are fixed within minutes, and each run can be replayed step by step."
+  },
+  {
+    "id": "automated-lead-enrichment",
+    "episode": 2,
+    "title": "Automated Lead Enrichment",
+    "summary": "Turn a bare email from a signup form into an enriched, scored lead that lands with the right rep, without anyone copying data between tabs.",
+    "problem": "New leads arrive with only a name and email. Reps waste time researching them by hand, and good leads sit untouched while bad ones get attention.",
+    "trigger": "New signup or form submission",
+    "tags": ["Sales", "AI", "CRM"],
+    "youtubeId": "aNsmn7X-au4",
+    "steps": [
+      { "type": "Integration", "name": "New lead arrives", "detail": "Triggered by a form, signup or CRM event." },
+      { "type": "Parallel", "name": "Enrich in parallel", "detail": "Call several data providers at once for company and contact details." },
+      { "type": "LLM", "name": "Summarize & score", "detail": "An LLM summarizes the company and scores fit against your ICP." },
+      { "type": "Switch", "name": "Route by score", "detail": "Hot leads go straight to a rep, the rest go to nurture." },
+      { "type": "HTTP", "name": "Update CRM", "detail": "Write the enriched record and score back to the CRM." }
+    ],
+    "outcome": "Every lead is enriched and routed in seconds, with a full audit trail of where each data point came from."
+  }
+]

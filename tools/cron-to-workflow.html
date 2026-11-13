@@ -1,0 +1,116 @@
+<section class="hero" style="padding-bottom:36px">
+  <div class="wrap">
+    <p class="eyebrow">Free tool &middot; by Unmeshed</p>
+    <h1>Cron &rarr; Workflow <span class="u">converter</span></h1>
+    <p class="lead">Paste any cron expression. See what it means in plain English, when it will run next, and how the same job looks as a retryable, observable workflow on <a href="{{UN}}/">Unmeshed</a>.</p>
+  </div>
+</section>
+
+<section style="padding-top:12px">
+  <div class="wrap">
+    <div class="tool">
+      <div>
+        <div class="field">
+          <label for="cron">Cron expression</label>
+          <input id="cron" type="text" value="0 2 * * 1-5" spellcheck="false" autocomplete="off" aria-describedby="cron-hint">
+          <p class="hint" id="cron-hint">5 fields: minute, hour, day of month, month, day of week. Macros like <code>@daily</code> work too.</p>
+        </div>
+        <div class="presets" aria-label="Example expressions">
+          <button class="chip" data-cron="*/5 * * * *">Every 5 min</button>
+          <button class="chip" data-cron="0 * * * *">Hourly</button>
+          <button class="chip" data-cron="0 2 * * 1-5">Weekdays 2am</button>
+          <button class="chip" data-cron="30 9 1 * *">1st of month</button>
+          <button class="chip" data-cron="0 9,13,17 * * MON-FRI">3x a day</button>
+          <button class="chip" data-cron="@weekly">@weekly</button>
+        </div>
+
+        <div class="fieldmap" id="fieldmap" aria-label="Fields"></div>
+
+        <div class="field" style="margin-top:22px">
+          <label for="tz">Time zone for next runs</label>
+          <select id="tz">
+            <option value="local">My local time</option>
+            <option value="utc">UTC</option>
+          </select>
+        </div>
+        <div class="field" style="margin-top:16px">
+          <label for="job">What does this job do?</label>
+          <select id="job">
+            <option value="shell">Runs a shell script on a server</option>
+            <option value="api">Calls an API or webhook</option>
+            <option value="python">Runs a Python script</option>
+            <option value="data">Syncs data between systems</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <div class="out">
+          <h3>In plain English</h3>
+          <p class="human" id="human">&nbsp;</p>
+          <button class="btn btn-outline btn-sm" id="copy" style="margin-top:12px">Copy description</button>
+        </div>
+        <div class="out">
+          <h3>Next 5 runs</h3>
+          <ul class="runs" id="runs"></ul>
+        </div>
+        <div class="out">
+          <h3>As an Unmeshed workflow</h3>
+          <div class="flow" id="wf"></div>
+          <p class="sub" style="font-size:.88rem;margin-top:4px">Scheduled with second-level precision, with retries, alerts, step-level replay and an audit log for every run. <a href="{{UN}}/docs/concepts/schedules">How schedules work &rarr;</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap prose">
+    <h2>Cron vs. an Unmeshed schedule</h2>
+    <p>Cron is great at one thing: starting a command at a time. Everything after that is up to you. Here's what changes when the same schedule runs as a workflow.</p>
+    <div style="overflow-x:auto">
+      <table class="compare">
+        <thead><tr><th></th><th>Cron / crontab</th><th>Unmeshed schedule</th></tr></thead>
+        <tbody>
+          <tr><td>Knows if a job failed</td><td class="no">No, unless you add logging</td><td class="yes">Yes, every run has a status</td></tr>
+          <tr><td>Retries</td><td class="no">Write your own</td><td class="yes">Built-in <a href="{{UN}}/docs/concepts/error-policies">error policies</a></td></tr>
+          <tr><td>Alerts</td><td class="no">Email from MAILTO, if configured</td><td class="yes">Slack, Teams or any integration as a step</td></tr>
+          <tr><td>Run history &amp; replay</td><td class="no">Grep the logs</td><td class="yes">Step-level history and replay</td></tr>
+          <tr><td>Dependencies between jobs</td><td class="no">Guess a time gap</td><td class="yes"><a href="{{UN}}/docs/how-to-guide/cross-process-dependencies">Cross-process dependencies</a></td></tr>
+          <tr><td>Runs across many servers</td><td class="no">One crontab per machine</td><td class="yes"><a href="{{UN}}/docs/agents/adding-agents-for-command-executions">Agents</a> on Linux, macOS, Windows, IBM i</td></tr>
+          <tr><td>Granularity</td><td>1 minute</td><td class="yes">1 second</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Cron syntax cheat sheet</h2>
+    <div style="overflow-x:auto">
+      <table class="compare">
+        <thead><tr><th>Field</th><th>Allowed values</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Minute</td><td>0&ndash;59</td><td><code>*/15</code> every 15 minutes</td></tr>
+          <tr><td>Hour</td><td>0&ndash;23</td><td><code>9-17</code> 9am to 5pm</td></tr>
+          <tr><td>Day of month</td><td>1&ndash;31</td><td><code>1,15</code> the 1st and 15th</td></tr>
+          <tr><td>Month</td><td>1&ndash;12 or JAN&ndash;DEC</td><td><code>*/3</code> every quarter</td></tr>
+          <tr><td>Day of week</td><td>0&ndash;7 or SUN&ndash;SAT (0 and 7 are Sunday)</td><td><code>MON-FRI</code> weekdays</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:12px"><code>*</code> means every value, <code>,</code> separates a list, <code>-</code> makes a range and <code>/</code> sets a step. When both day of month and day of week are restricted, standard cron runs the job when <em>either</em> one matches.</p>
+
+    <h2>Common questions</h2>
+    <p><b>Does this tool send my cron expression anywhere?</b><br>No. Everything runs in your browser.</p>
+    <p><b>Why are my next run times different on the server?</b><br>Cron uses the server's time zone. Switch the time zone above to UTC if your server runs on UTC, which most cloud servers do.</p>
+    <p><b>How do I move a cron job to Unmeshed?</b><br>Create a schedule with the same expression and point it at a workflow. For shell scripts, install an <a href="{{UN}}/docs/agents/adding-agents-for-command-executions">Unmeshed agent</a> on the server and run the command as a step. The <a href="{{UN}}/docs/use-cases/scheduled-jobs">scheduled jobs guide</a> walks through it.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta">
+      <h2>Retire the crontab</h2>
+      <p>Move scheduled jobs to Unmeshed and get retries, alerts and a full run history without writing glue code. Free tier, no credit card required.</p>
+      <a class="btn btn-primary" href="{{UN}}/{{UTM}}&utm_campaign=cron-tool">Start free on unmeshed.io</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,12 @@
+{
+  "name": "unmeshed-showcase",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Steal This Workflow: production-ready workflow recipes built on Unmeshed, plus a free Cron to Workflow converter.",
+  "homepage": "https://unmeshed.io",
+  "scripts": {
+    "build": "node build.js",
+    "preview": "node build.js && npx serve dist"
+  },
+  "engines": { "node": ">=18" }
+}
